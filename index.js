@@ -26,6 +26,9 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    const serviceCollections = client
+      .db("creative-agency")
+      .collection("service");
     const ordersCollections = client.db("creative-agency").collection("order");
     const reviewsCollections = client
       .db("creative-agency")
@@ -98,6 +101,19 @@ async function run() {
         const result = await usersCollections.insertOne(userData);
       }
       res.send({ token });
+    });
+
+    // get service
+    app.get("/service", async (req, res) => {
+      const query = {};
+      const result = await serviceCollections.find(query).toArray();
+      res.send(result);
+    });
+
+    app.post("/service", async (req, res) => {
+      const service = req.body.service;
+      const result = await serviceCollections.insertOne(service);
+      res.send(result);
     });
   } finally {
     // Ensures that the client will close when you finish/error
