@@ -103,6 +103,30 @@ async function run() {
       res.send({ token });
     });
 
+    // Get Users
+    app.get("/user", async (req, res) => {
+      const query = {};
+      const result = await usersCollections.find(query).toArray();
+      res.send(result);
+    });
+
+    // Update User
+    app.put("/user/:id", async (req, res) => {
+      const { id } = req.params;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          role: "Admin",
+        },
+      };
+      const result = await usersCollections.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send(result);
+    });
     // get service
     app.get("/service", async (req, res) => {
       const query = {};
