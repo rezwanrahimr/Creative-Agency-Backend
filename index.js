@@ -127,6 +127,18 @@ async function run() {
       );
       res.send(result);
     });
+
+    // Delete User
+    app.delete("/user/:id", async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: new ObjectId(id) };
+      const checkUser = await usersCollections.findOne(query);
+      if (checkUser.role !== "Admin") {
+        return;
+      }
+      const result = await usersCollections.deleteOne(query);
+      res.send(result);
+    });
     // get service
     app.get("/service", async (req, res) => {
       const query = {};
