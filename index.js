@@ -22,10 +22,29 @@ const client = new MongoClient(uri, {
   },
 });
 
+//
+const verifyJWT = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(403);
+  }
+  const token = authHeader.split(" ")[1];
+
+  // verify a token symmetric
+  jwt.verify(token, process.env.JWT_TOKEN, function (err, decoded) {
+    if (err) {
+      return res.status(403);
+    }
+    res.decoded = decoded;
+    next();
+  });
+};
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const serviceCollections = client
       .db("creative-agency")
       .collection("service");
@@ -44,9 +63,9 @@ async function run() {
     });
 
     // Get Order
-    app.get("/order", async (req, res) => {
+    app.get("/order", verifyJWT, async (req, res) => {
       const email = req.query.email;
-      console.log(email);
+
       const query = { email: email };
       const result = await ordersCollections.find(query).toArray();
       res.send(result);
@@ -137,6 +156,14 @@ async function run() {
         return;
       }
       const result = await usersCollections.deleteOne(query);
+      res.send(result);
+    });
+
+    // Check Admin
+    app.get("/user-admin", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await usersCollections.findOne(query);
       res.send(result);
     });
     // get service
