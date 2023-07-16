@@ -22,7 +22,7 @@ const client = new MongoClient(uri, {
   },
 });
 
-//
+// jwt function
 const verifyJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -103,6 +103,7 @@ async function run() {
       res.send(result);
     });
 
+    // All Review
     app.get("/review", async (req, res) => {
       const query = {};
       const result = await reviewsCollections.find(query).toArray();
@@ -173,6 +174,7 @@ async function run() {
       res.send(result);
     });
 
+    // store service on database.
     app.post("/service", async (req, res) => {
       const service = req.body.service;
       const result = await serviceCollections.insertOne(service);
